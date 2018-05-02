@@ -571,6 +571,7 @@ var util = (function() {
   var lowers = 'abcdefghijklmnopqrstuvwxyz';
   var uppers = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   var underscore = '_';
+  var escapable_chars = '/:';
 
   var _is_in = function(in_list, in_c) {
     return in_list.indexOf(in_c) >= 0;
@@ -596,7 +597,9 @@ var util = (function() {
     is_whitespace: function(in_c) {
       return ' ' == in_c || '\t' == in_c;
     },
-
+    is_escapable: function(in_c) {
+      return _is_in(escapable_chars + digits + lowers + uppers, in_c)
+    },
     trim: function(in_str) {
       return in_str.replace(/^\s+|\s+$/g, '')
     }
@@ -635,7 +638,7 @@ var parser = (function() {
             tmp_buffer = c;
             state = 1;
           }
-          else if ('/' == c) {
+          else if ('#' == c) {
             state = 3;
           }
           else if ('-' == c) {
@@ -684,7 +687,7 @@ var parser = (function() {
           break;
 
         case 3: //second slash in comment
-          if ('/' == c) {
+          if (' ' === c) {
             state = 4;
           }
           break;
